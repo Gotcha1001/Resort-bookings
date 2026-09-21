@@ -8,7 +8,7 @@ import { useMonthNavigation } from "@/hooks/use-month-navigation";
 import type {
   BookingSelection,
   SelectedRange,
-} from "@/hooks/use-booking-selection";
+} from "@/hooks/useBookingSelection";
 import { startOfDay } from "@/lib/dates";
 import { formatDate } from "@/lib/format";
 import { calculateEndDate } from "@/lib/pricing";
