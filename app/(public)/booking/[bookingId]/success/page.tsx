@@ -1,14 +1,16 @@
-// app/(public)/booking/[bookingId]/success/page.tsx
 "use client";
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { CheckCircle2, Loader2, Clock } from "lucide-react";
+
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+
 import { formatCurrency, formatDate } from "@/lib/format";
+import { DownloadInvoiceButton } from "@/app/components/bookings/DownloadInvoiceButton";
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
@@ -110,7 +112,6 @@ export default function BookingSuccessPage({ params }: PageProps) {
   return (
     <div className="mx-auto max-w-lg px-6 py-16 text-center">
       <CheckCircle2 className="mx-auto h-16 w-16 text-teal-600 dark:text-teal-400" />
-
       <h1 className="mt-6 text-3xl font-bold text-stone-900 dark:text-stone-50">
         {isPaid ? "Payment successful" : "Booking confirmed"}
       </h1>
@@ -161,13 +162,18 @@ export default function BookingSuccessPage({ params }: PageProps) {
       </div>
 
       <p className="mt-6 text-xs text-stone-400">
-        A confirmation may be sent to the phone number you provided. Keep this
-        page or screenshot for your records.
+        A confirmation may be sent to the phone number you provided.
+        {isPaid
+          ? " Download your invoice below for your records."
+          : " Keep this page or screenshot for your records."}
       </p>
 
-      <Button asChild className="mt-8 bg-teal-600 text-white hover:bg-teal-500">
-        <Link href="/rooms">Browse more stays</Link>
-      </Button>
+      <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        {isPaid && <DownloadInvoiceButton booking={booking} />}
+        <Button asChild className="bg-teal-600 text-white hover:bg-teal-500">
+          <Link href="/rooms">Browse more stays</Link>
+        </Button>
+      </div>
     </div>
   );
 }
