@@ -1,18 +1,17 @@
-// components/bookings/StatusBadge.tsx
 import type { Doc } from "@/convex/_generated/dataModel";
 
 type BookingStatus = Doc<"bookings">["status"];
 
 const STATUS_STYLES: Record<BookingStatus, string> = {
   pending_payment:
-    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+    "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
   active: "bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300",
   cancelled: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
   expired: "bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400",
 };
 
 const STATUS_LABELS: Record<BookingStatus, string> = {
-  pending_payment: "Pending payment",
+  pending_payment: "Awaiting payment",
   active: "Active",
   cancelled: "Cancelled",
   expired: "Expired",

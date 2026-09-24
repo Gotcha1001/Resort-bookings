@@ -1,38 +1,41 @@
+// app/(admin)/dashboard/page.tsx
 "use client";
 
 import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import Link from "next/link";
 import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
+import type { Doc, Id } from "@/convex/_generated/dataModel";
+
+import { getMonthRange } from "@/lib/format";
 import { FinancialSummaryCards } from "@/app/components/dashboard/FinancialSummaryCards";
 import { BookingTable } from "@/app/components/bookings/BookingTable";
-import { getMonthRange } from "@/lib/format";
+
+type BookingWithRoomName = Doc<"bookings"> & { roomName?: string };
 
 export default function DashboardPage() {
   const summary = useQuery(api.bookings.financialSummary, {});
   const currentMonthBookings = useQuery(api.bookings.listCurrentMonth, {});
-  const venues = useQuery(api.venues.list, { includeArchived: true });
+  const rooms = useQuery(api.rooms.list, { includeArchived: true });
 
   const monthLabel = getMonthRange().label;
 
-  const venueNameById = useMemo(() => {
-    const map = new Map<Id<"venues">, string>();
-    for (const venue of venues ?? []) {
-      map.set(venue._id, venue.name);
+  const roomNameById = useMemo(() => {
+    const map = new Map<Id<"rooms">, string>();
+    for (const room of rooms ?? []) {
+      map.set(room._id, room.name);
     }
     return map;
-  }, [venues]);
+  }, [rooms]);
 
-  const recentBookings = useMemo(() => {
+  const recentBookings = useMemo((): BookingWithRoomName[] | undefined => {
     if (!currentMonthBookings) return undefined;
-    return currentMonthBookings
-      .slice(0, 6)
-      .map((booking) => ({
-        ...booking,
-        venueName: venueNameById.get(booking.venueId),
-      }));
-  }, [currentMonthBookings, venueNameById]);
+
+    return currentMonthBookings.slice(0, 6).map((booking) => ({
+      ...booking,
+      roomName: roomNameById.get(booking.roomId),
+    }));
+  }, [currentMonthBookings, roomNameById]);
 
   return (
     <div className="space-y-6">
@@ -58,17 +61,18 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/bookings"
-            className="text-sm text-teal-600 hover:underline"
+            className="text-sm text-teal-600 hover:underline dark:text-teal-400"
           >
             View all
           </Link>
         </div>
+
         {recentBookings === undefined ? (
           <p className="text-sm text-stone-500">Loading bookings…</p>
         ) : (
           <BookingTable
             bookings={recentBookings}
-            showVenueColumn
+            showRoomColumn
             emptyMessage="No bookings yet this month."
           />
         )}

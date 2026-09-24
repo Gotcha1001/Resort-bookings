@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export interface VenueImage {
+export interface RoomImage {
   url: string;
   publicId: string;
 }
@@ -23,12 +23,12 @@ interface CloudinaryUploadResponse {
   public_id: string;
 }
 
-interface VenueImageUploadProps {
-  value: VenueImage | null;
-  onChange: (image: VenueImage | null) => void;
+interface RoomImageUploadProps {
+  value: RoomImage | null;
+  onChange: (image: RoomImage | null) => void;
 }
 
-export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
+export function RoomImageUpload({ value, onChange }: RoomImageUploadProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -38,7 +38,6 @@ export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
     const file = event.target.files?.[0];
     event.target.value = ""; // allow re-selecting the same file later
     if (!file) return;
-
     if (!file.type.startsWith("image/")) {
       toast.error("Please choose an image file");
       return;
@@ -47,7 +46,6 @@ export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
       toast.error("Image must be under 10MB");
       return;
     }
-
     setIsUploading(true);
     try {
       const signResponse = await fetch("/api/cloudinary/sign", {
@@ -57,14 +55,12 @@ export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
         throw new Error("Could not get an upload signature");
       }
       const sign: SignResponse = await signResponse.json();
-
       const formData = new FormData();
       formData.append("file", file);
       formData.append("api_key", sign.apiKey);
       formData.append("timestamp", String(sign.timestamp));
       formData.append("signature", sign.signature);
       formData.append("folder", sign.folder);
-
       const uploadResponse = await fetch(
         `https://api.cloudinary.com/v1_1/${sign.cloudName}/image/upload`,
         { method: "POST", body: formData },
@@ -73,7 +69,6 @@ export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
         throw new Error("Upload to Cloudinary failed");
       }
       const uploaded: CloudinaryUploadResponse = await uploadResponse.json();
-
       onChange({ url: uploaded.secure_url, publicId: uploaded.public_id });
     } catch (error) {
       toast.error(
@@ -98,7 +93,7 @@ export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
           {/* eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL */}
           <img
             src={value.url}
-            alt="Room or venue photo"
+            alt="Room or cottage photo"
             className="h-40 w-full object-cover"
           />
           <Button
@@ -122,7 +117,7 @@ export function VenueImageUpload({ value, onChange }: VenueImageUploadProps) {
           {isUploading ? (
             <>
               <Loader2 size={20} className="animate-spin" />
-              Uploading…
+              Uploading...
             </>
           ) : (
             <>

@@ -1,10 +1,11 @@
+// app/(admin)/bookings/page.tsx
 "use client";
 
 import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
-import { BookingTable } from "@/app/components/bookings/BookingTable";
+
 import {
   Select,
   SelectContent,
@@ -13,31 +14,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getMonthRange } from "@/lib/format";
+import { BookingTable } from "@/app/components/bookings/BookingTable";
 
-type StatusFilter = "all" | "active" | "cancelled" | "expired";
+type StatusFilter =
+  | "all"
+  | "pending_payment"
+  | "active"
+  | "cancelled"
+  | "expired";
 
-export default function BookingsPage() {
+type BookingWithRoomName = Doc<"bookings"> & { roomName?: string };
+
+export default function AdminBookingsPage() {
   const bookings = useQuery(api.bookings.listCurrentMonth, {});
-  const venues = useQuery(api.venues.list, { includeArchived: true });
+  const rooms = useQuery(api.rooms.list, { includeArchived: true });
+
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
-  const venueNameById = useMemo(() => {
-    const map = new Map<Id<"venues">, string>();
-    for (const venue of venues ?? []) {
-      map.set(venue._id, venue.name);
+  const roomNameById = useMemo(() => {
+    const map = new Map<Id<"rooms">, string>();
+    for (const room of rooms ?? []) {
+      map.set(room._id, room.name);
     }
     return map;
-  }, [venues]);
+  }, [rooms]);
 
-  const filteredBookings = useMemo(() => {
+  const filteredBookings = useMemo((): BookingWithRoomName[] | undefined => {
     if (!bookings) return undefined;
-    const withVenueName = bookings.map((booking: Doc<"bookings">) => ({
+
+    const withRoomName: BookingWithRoomName[] = bookings.map((booking) => ({
       ...booking,
-      venueName: venueNameById.get(booking.venueId),
+      roomName: roomNameById.get(booking.roomId),
     }));
-    if (statusFilter === "all") return withVenueName;
-    return withVenueName.filter((booking) => booking.status === statusFilter);
-  }, [bookings, statusFilter, venueNameById]);
+
+    if (statusFilter === "all") return withRoomName;
+    return withRoomName.filter((b) => b.status === statusFilter);
+  }, [bookings, statusFilter, roomNameById]);
 
   const monthLabel = getMonthRange().label;
 
@@ -49,18 +61,20 @@ export default function BookingsPage() {
             Bookings
           </h1>
           <p className="text-sm text-stone-500 dark:text-stone-400">
-            {monthLabel}
+            {monthLabel} · paid status updates automatically via PayFast
           </p>
         </div>
+
         <Select
           value={statusFilter}
           onValueChange={(value) => setStatusFilter(value as StatusFilter)}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-44">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="pending_payment">Pending payment</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="cancelled">Cancelled</SelectItem>
             <SelectItem value="expired">Expired</SelectItem>
@@ -73,7 +87,7 @@ export default function BookingsPage() {
       ) : (
         <BookingTable
           bookings={filteredBookings}
-          showVenueColumn
+          showRoomColumn
           emptyMessage="No bookings match this filter."
         />
       )}
