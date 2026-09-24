@@ -3,37 +3,39 @@
 
 import Link from "next/link";
 import { useQuery } from "convex/react";
-import { MapPin, Heart, Leaf, Coffee } from "lucide-react";
+import { ImageOff, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
-
-const VALUES = [
-  {
-    icon: Heart,
-    title: "Warm hospitality",
-    description:
-      "Every stay is personal. We look after the small details so you can simply relax.",
-  },
-  {
-    icon: Leaf,
-    title: "Nature first",
-    description:
-      "Surrounded by open space, quiet mornings and star-filled skies — the perfect reset.",
-  },
-  {
-    icon: Coffee,
-    title: "Home away from home",
-    description:
-      "Comfortable rooms and cottages, thoughtful amenities, and space to unwind at your own pace.",
-  },
-];
+import {
+  DEFAULT_ABOUT_HEADING,
+  DEFAULT_LOCATION_TEXT,
+  defaultAboutStory,
+} from "@/lib/siteContent";
+import { ContentCarousel } from "@/app/components/site/ContentCarousel";
+import { ContactInfo } from "@/app/components/site/ContactInfo";
 
 export default function AboutPage() {
   const settings = useQuery(api.resortSettings.get);
+  const values = useQuery(api.siteContent.listPublic, {
+    section: "aboutValues",
+  });
 
   const resortName = settings?.name ?? "Our Resort";
   const tagline =
     settings?.tagline ?? "A peaceful escape where comfort meets the outdoors.";
+  const heading = settings?.aboutHeading || DEFAULT_ABOUT_HEADING;
+  const story = settings?.aboutStory || defaultAboutStory(resortName);
+  const locationText = settings?.aboutLocationText || DEFAULT_LOCATION_TEXT;
+  // aboutStory paragraphs are separated by a blank line (see AboutSettingsForm).
+  const storyParagraphs = story.split(/\n\s*\n/).filter(Boolean);
+
+  const slides = (values ?? [])
+    .filter((item) => item.imageUrl)
+    .map((item) => ({
+      _id: item._id,
+      title: item.title,
+      imageUrl: item.imageUrl as string,
+    }));
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
@@ -50,23 +52,20 @@ export default function AboutPage() {
         </p>
       </div>
 
+      {slides.length > 0 && (
+        <div className="mt-10">
+          <ContentCarousel slides={slides} />
+        </div>
+      )}
+
       {/* Story */}
       <section className="mt-14 space-y-5 text-stone-600 dark:text-stone-300">
         <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-50">
-          Our story
+          {heading}
         </h2>
-        <p>
-          {resortName} was created for people who want more than a quick
-          overnight stop — a place to slow down, reconnect and enjoy the simple
-          things. Whether you&apos;re here for a weekend away, a longer break or
-          a special occasion, we aim to make every stay easy and memorable.
-        </p>
-        <p>
-          Our rooms and cottages are designed for comfort: clean, well-equipped
-          and ready for rest. Beyond your door, you&apos;ll find space to
-          breathe, paths to explore and the kind of quiet that&apos;s hard to
-          find elsewhere.
-        </p>
+        {storyParagraphs.map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
       </section>
 
       {/* Values */}
@@ -75,24 +74,47 @@ export default function AboutPage() {
           What we care about
         </h2>
         <div className="mt-6 grid gap-6 sm:grid-cols-3">
-          {VALUES.map(({ icon: Icon, title, description }) => (
-            <div
-              key={title}
-              className="rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900"
-            >
-              <Icon className="text-teal-600 dark:text-teal-400" size={28} />
-              <h3 className="mt-3 text-lg font-semibold text-stone-900 dark:text-stone-50">
-                {title}
-              </h3>
-              <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">
-                {description}
-              </p>
-            </div>
-          ))}
+          {values === undefined ? (
+            <p className="col-span-full text-sm text-stone-500">Loading…</p>
+          ) : values.length === 0 ? (
+            <p className="col-span-full text-sm text-stone-500">
+              More about us coming soon.
+            </p>
+          ) : (
+            values.map((item) => (
+              <div
+                key={item._id}
+                className="overflow-hidden rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900"
+              >
+                {item.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="h-32 w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-32 w-full items-center justify-center bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
+                    <ImageOff size={20} />
+                  </div>
+                )}
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+                    {item.title}
+                  </h3>
+                  {item.description && (
+                    <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
-      {/* Location placeholder */}
+      {/* Location */}
       <section className="mt-14 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900 sm:p-8">
         <div className="flex items-start gap-3">
           <MapPin
@@ -104,14 +126,22 @@ export default function AboutPage() {
               Where to find us
             </h2>
             <p className="mt-2 text-stone-600 dark:text-stone-300">
-              {/* Replace with your real address / directions */}
-              We&apos;re set in a peaceful corner of the countryside — easy to
-              reach, hard to leave. Full directions and parking details are
-              shared after you book.
+              {locationText}
             </p>
           </div>
         </div>
       </section>
+
+      {/* Contact */}
+      {settings && (
+        <div className="mt-8">
+          <ContactInfo
+            phone={settings.phone}
+            email={settings.email}
+            address={settings.address}
+          />
+        </div>
+      )}
 
       {/* CTA */}
       <div className="mt-14 flex flex-wrap justify-center gap-4 text-center">
@@ -120,7 +150,7 @@ export default function AboutPage() {
           size="lg"
           className="bg-teal-600 px-8 text-white hover:bg-teal-500"
         >
-          <Link href="/rooms">Browse rooms & cottages</Link>
+          <Link href="/rooms">Browse rooms &amp; cottages</Link>
         </Button>
         <Button asChild size="lg" variant="outline">
           <Link href="/amenities">See amenities</Link>
