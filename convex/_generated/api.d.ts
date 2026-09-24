@@ -13,6 +13,7 @@ import type * as cloudinary from "../cloudinary.js";
 import type * as crons from "../crons.js";
 import type * as resortSettings from "../resortSettings.js";
 import type * as rooms from "../rooms.js";
+import type * as siteContent from "../siteContent.js";
 import type * as user from "../user.js";
 
 import type {
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   resortSettings: typeof resortSettings;
   rooms: typeof rooms;
+  siteContent: typeof siteContent;
   user: typeof user;
 }>;
 
