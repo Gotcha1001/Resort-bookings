@@ -1,3 +1,4 @@
+// components/bookings/BookingTable.tsx
 "use client";
 
 import { useState } from "react";
@@ -20,17 +21,17 @@ import {
 import { formatCurrency, formatDate } from "@/lib/format";
 import { StatusBadge, PaidBadge } from "./StatusBadge";
 
-type BookingWithVenueName = Doc<"bookings"> & { venueName?: string };
+type BookingWithRoomName = Doc<"bookings"> & { roomName?: string };
 
 interface BookingTableProps {
-  bookings: BookingWithVenueName[];
-  showVenueColumn?: boolean;
+  bookings: BookingWithRoomName[];
+  showRoomColumn?: boolean;
   emptyMessage?: string;
 }
 
 export function BookingTable({
   bookings,
-  showVenueColumn = false,
+  showRoomColumn = false,
   emptyMessage = "No bookings yet.",
 }: BookingTableProps) {
   const markAsPaid = useMutation(api.bookings.markAsPaid);
@@ -99,10 +100,8 @@ export function BookingTable({
       <table className="w-full text-left text-sm">
         <thead className="bg-stone-50 text-xs uppercase tracking-wide text-stone-500 dark:bg-stone-900 dark:text-stone-400">
           <tr>
-            {showVenueColumn && (
-              <th className="px-4 py-3 font-medium">Venue</th>
-            )}
-            <th className="px-4 py-3 font-medium">Customer</th>
+            {showRoomColumn && <th className="px-4 py-3 font-medium">Room</th>}
+            <th className="px-4 py-3 font-medium">Guest</th>
             <th className="px-4 py-3 font-medium">Contact</th>
             <th className="px-4 py-3 font-medium">Period</th>
             <th className="px-4 py-3 font-medium">Amount</th>
@@ -114,27 +113,32 @@ export function BookingTable({
         <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
           {bookings.map((booking) => {
             const isBusy = pendingId === booking._id;
-            const canModify = booking.status === "active";
+            // Active bookings can be cancelled / payment toggled.
+            // Pending payment can still be cancelled (frees the hold).
+            const canModify =
+              booking.status === "active" ||
+              booking.status === "pending_payment";
             const isCancelled = booking.status === "cancelled";
+
             return (
               <tr key={booking._id}>
-                {showVenueColumn && (
+                {showRoomColumn && (
                   <td className="px-4 py-3 font-medium text-stone-900 dark:text-stone-100">
-                    {booking.venueName ?? "—"}
+                    {booking.roomName ?? "—"}
                   </td>
                 )}
                 <td className="px-4 py-3">
                   <div className="font-medium text-stone-900 dark:text-stone-100">
-                    {booking.customerName}
+                    {booking.guestName}
                   </div>
-                  {booking.email && (
+                  {booking.guestEmail && (
                     <div className="text-xs text-stone-400">
-                      {booking.email}
+                      {booking.guestEmail}
                     </div>
                   )}
                 </td>
                 <td className="px-4 py-3 text-stone-600 dark:text-stone-300">
-                  {booking.contactNumber}
+                  {booking.guestPhone}
                 </td>
                 <td className="px-4 py-3 text-stone-600 dark:text-stone-300">
                   <div>{formatDate(booking.startDate)}</div>
@@ -145,8 +149,8 @@ export function BookingTable({
                 <td className="px-4 py-3 font-medium text-stone-900 dark:text-stone-100">
                   {formatCurrency(booking.amount)}
                   <div className="text-xs font-normal text-stone-400">
-                    {booking.numberOfDays}{" "}
-                    {booking.numberOfDays === 1 ? "night" : "nights"}
+                    {booking.numberOfNights}{" "}
+                    {booking.numberOfNights === 1 ? "night" : "nights"}
                   </div>
                 </td>
                 <td className="px-4 py-3">
@@ -157,6 +161,8 @@ export function BookingTable({
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
+                    {/* Manual paid toggle – mainly for walk-ins / admin overrides.
+                        PayFast ITN flips isPaid automatically for online bookings. */}
                     <Button
                       size="sm"
                       variant={booking.isPaid ? "outline" : "default"}
@@ -165,6 +171,7 @@ export function BookingTable({
                     >
                       {booking.isPaid ? "Mark unpaid" : "Mark paid"}
                     </Button>
+
                     {canModify && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -182,8 +189,8 @@ export function BookingTable({
                               Cancel this booking?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              This frees up {booking.venueName ?? "the venue"}{" "}
-                              for {formatDate(booking.startDate)} –{" "}
+                              This frees up {booking.roomName ?? "the room"} for{" "}
+                              {formatDate(booking.startDate)} –{" "}
                               {formatDate(booking.endDate)}. This can&apos;t be
                               undone.
                             </AlertDialogDescription>
@@ -199,6 +206,7 @@ export function BookingTable({
                         </AlertDialogContent>
                       </AlertDialog>
                     )}
+
                     {isCancelled && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -216,10 +224,10 @@ export function BookingTable({
                               Delete this booking record?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              This permanently removes {booking.customerName}
+                              This permanently removes {booking.guestName}
                               &apos;s cancelled booking for{" "}
-                              {booking.venueName ?? "this venue"}. This
-                              can&apos;t be undone.
+                              {booking.roomName ?? "this room"}. This can&apos;t
+                              be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

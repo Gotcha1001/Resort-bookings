@@ -1,70 +1,46 @@
-// app/components/calendar/BookingCalendar.tsx
+// app/components/calendar/PublicAvailabilityCalendar.tsx
 "use client";
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Doc } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { useMonthNavigation } from "@/hooks/use-month-navigation";
 import type {
   BookingSelection,
   SelectedRange,
 } from "@/hooks/useBookingSelection";
-import { startOfDay } from "@/lib/dates";
-import { formatDate } from "@/lib/format";
-import { calculateEndDate } from "@/lib/pricing";
+import { addDays, startOfDay } from "@/lib/dates";
+import { formatCurrency, formatDate } from "@/lib/format";
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-const EMPTY_SELECTION: BookingSelection = { start: null, end: null };
-
-function bookingForDay(
-  bookings: Doc<"bookings">[],
-  day: Date,
-): Doc<"bookings"> | undefined {
-  const dayStart = new Date(
-    day.getFullYear(),
-    day.getMonth(),
-    day.getDate(),
-  ).getTime();
-  const dayEnd = dayStart + 24 * 60 * 60 * 1000;
-  return bookings.find(
-    (booking) =>
-      booking.status === "active" &&
-      booking.startDate < dayEnd &&
-      booking.endDate > dayStart,
-  );
-}
 
 function nightsLabel(count: number): string {
   return `${count} night${count === 1 ? "" : "s"}`;
 }
 
-interface BookingCalendarProps {
-  bookings: Doc<"bookings">[];
-  /**
-   * When true, the calendar is a pure occupancy view: no click-to-select,
-   * no hover preview, no "book this range" affordance. Used on the admin
-   * room-detail page, which only needs to show what's booked.
-   */
-  readOnly?: boolean;
-  /** Required unless readOnly is true. */
-  selection?: BookingSelection;
-  range?: SelectedRange | null;
-  onDayClick?: (day: Date) => void;
-  onClearSelection?: () => void;
-  onBookSelection?: () => void;
+interface PublicAvailabilityCalendarProps {
+  /** From usePublicDateSelection. Anonymous: no guest names anywhere. */
+  bookedDays: ReadonlySet<number>;
+  selection: BookingSelection;
+  range: SelectedRange | null;
+  onDayClick: (day: Date) => void;
+  onClearSelection: () => void;
+  onContinue: () => void;
+  /** When given, the selection banner shows an estimated total. */
+  pricePerNight?: number;
+  continueLabel?: string;
 }
 
-export function BookingCalendar({
-  bookings,
-  readOnly = false,
-  selection = EMPTY_SELECTION,
-  range = null,
+export function PublicAvailabilityCalendar({
+  bookedDays,
+  selection,
+  range,
   onDayClick,
   onClearSelection,
-  onBookSelection,
-}: BookingCalendarProps) {
+  onContinue,
+  pricePerNight,
+  continueLabel = "Continue",
+}: PublicAvailabilityCalendarProps) {
   const {
     viewedDate,
     monthLabel,
@@ -73,7 +49,6 @@ export function BookingCalendar({
     goToNextMonth,
     goToToday,
   } = useMonthNavigation();
-
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
   const leadingBlanks = new Date(
@@ -81,18 +56,12 @@ export function BookingCalendar({
     viewedDate.getMonth(),
     1,
   ).getDay();
-
-  const today = new Date();
+  const todayStart = startOfDay(new Date());
   const { start, end } = selection;
 
   // While only the start is picked, preview the stay up to the hovered day.
-  // Never applies in readOnly mode since there's nothing to select.
   const previewEnd =
-    !readOnly &&
-    start !== null &&
-    end === null &&
-    hoveredDay !== null &&
-    hoveredDay > start
+    start !== null && end === null && hoveredDay !== null && hoveredDay > start
       ? hoveredDay
       : null;
   const highlightEnd = end ?? previewEnd;
@@ -144,34 +113,30 @@ export function BookingCalendar({
 
         {daysInMonth.map((day) => {
           const dayStart = startOfDay(day);
-          const booking = bookingForDay(bookings, day);
-          const isToday =
-            day.getFullYear() === today.getFullYear() &&
-            day.getMonth() === today.getMonth() &&
-            day.getDate() === today.getDate();
-          const isStart = !readOnly && start === dayStart;
-          const isEnd = !readOnly && end !== null && end === dayStart;
+          const isBooked = bookedDays.has(dayStart);
+          const isPast = dayStart < todayStart;
+          const isToday = dayStart === todayStart;
+          const isStart = start === dayStart;
+          const isEnd = end !== null && end === dayStart;
           const isInRange =
-            !readOnly &&
             start !== null &&
             highlightEnd !== null &&
             dayStart > start &&
             dayStart <= highlightEnd;
 
           let stateClasses: string;
-          if (booking) {
-            stateClasses = readOnly
-              ? "cursor-default bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300"
-              : "cursor-not-allowed bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300";
+          if (isPast) {
+            stateClasses =
+              "cursor-not-allowed text-stone-300 dark:text-stone-700";
+          } else if (isBooked) {
+            stateClasses =
+              "cursor-not-allowed bg-amber-100 text-amber-900 line-through dark:bg-amber-950 dark:text-amber-300";
           } else if (isStart || isEnd) {
             stateClasses =
               "bg-teal-600 text-white dark:bg-teal-500 dark:text-stone-950";
           } else if (isInRange) {
             stateClasses =
               "bg-teal-100 text-teal-900 dark:bg-teal-900/50 dark:text-teal-100";
-          } else if (readOnly) {
-            stateClasses =
-              "cursor-default bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300";
           } else {
             stateClasses =
               "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/50";
@@ -181,36 +146,22 @@ export function BookingCalendar({
             <button
               key={dayStart}
               type="button"
-              disabled={readOnly || booking !== undefined}
-              onClick={
-                readOnly || !onDayClick ? undefined : () => onDayClick(day)
-              }
-              onMouseEnter={
-                readOnly ? undefined : () => setHoveredDay(dayStart)
-              }
-              aria-pressed={!readOnly && (isStart || isEnd || isInRange)}
-              aria-label={`${formatDate(dayStart)}${
-                booking ? `, booked by ${booking.guestName}` : ", available"
+              disabled={isPast || isBooked}
+              onClick={() => onDayClick(day)}
+              onMouseEnter={() => setHoveredDay(dayStart)}
+              aria-pressed={isStart || isEnd || isInRange}
+              aria-label={`${formatDate(dayStart)}, ${
+                isPast ? "unavailable" : isBooked ? "booked" : "available"
               }`}
-              title={
-                booking
-                  ? `${booking.guestName} (${nightsLabel(booking.numberOfNights)})`
-                  : "Available"
-              }
               className={`flex h-12 flex-col items-center justify-center rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${stateClasses} ${
                 isToday && !isStart && !isEnd ? "ring-2 ring-teal-500" : ""
               }`}
             >
               <span className="font-medium">{day.getDate()}</span>
-              {booking && (
-                <span className="max-w-full truncate px-1 text-[10px]">
-                  {booking.guestName}
-                </span>
-              )}
-              {!readOnly && !booking && isStart && (
+              {!isBooked && !isPast && isStart && (
                 <span className="text-[10px]">Check-in</span>
               )}
-              {!readOnly && !booking && !isStart && isEnd && (
+              {!isBooked && !isPast && !isStart && isEnd && (
                 <span className="text-[10px]">Last night</span>
               )}
             </button>
@@ -218,12 +169,7 @@ export function BookingCalendar({
         })}
       </div>
 
-      {readOnly ? (
-        <p className="mt-4 text-xs text-stone-500">
-          Amber days are booked. This calendar is view-only — bookings are made
-          from the customer-facing room page.
-        </p>
-      ) : range ? (
+      {range ? (
         <div className="mt-4 flex flex-col gap-3 rounded-lg bg-teal-50 p-3 text-sm dark:bg-teal-950/40 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-stone-700 dark:text-stone-200">
             {end === null ? (
@@ -232,7 +178,7 @@ export function BookingCalendar({
                 <span className="font-semibold">
                   {formatDate(range.startDate)}
                 </span>
-                . Click the last night of the stay, or book just one night.
+                . Pick your last night, or continue with one night.
               </>
             ) : (
               <>
@@ -241,11 +187,18 @@ export function BookingCalendar({
                 </span>{" "}
                 to check-out{" "}
                 <span className="font-semibold">
-                  {formatDate(
-                    calculateEndDate(range.startDate, range.numberOfDays),
-                  )}
+                  {formatDate(addDays(range.startDate, range.numberOfDays))}
                 </span>{" "}
                 ({nightsLabel(range.numberOfDays)})
+              </>
+            )}
+            {pricePerNight !== undefined && (
+              <>
+                {" "}
+                &middot;{" "}
+                <span className="font-semibold">
+                  {formatCurrency(range.numberOfDays * pricePerNight)}
+                </span>
               </>
             )}
           </p>
@@ -253,15 +206,14 @@ export function BookingCalendar({
             <Button size="sm" variant="ghost" onClick={onClearSelection}>
               Clear
             </Button>
-            <Button size="sm" onClick={onBookSelection}>
-              Book {nightsLabel(range.numberOfDays)}
+            <Button size="sm" onClick={onContinue}>
+              {continueLabel}
             </Button>
           </div>
         </div>
       ) : (
         <p className="mt-4 text-xs text-stone-500">
-          Click a green day to set the check-in, then click the last night of
-          the stay.
+          Tap a green day for your check-in, then tap your last night.
         </p>
       )}
 
@@ -272,11 +224,9 @@ export function BookingCalendar({
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> Booked
         </span>
-        {!readOnly && (
-          <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-teal-500" /> Selected
-          </span>
-        )}
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-teal-500" /> Your stay
+        </span>
       </div>
     </div>
   );

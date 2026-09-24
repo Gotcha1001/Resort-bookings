@@ -25,7 +25,6 @@ export function FinancialSummaryCards({
     { label: "Outstanding", value: formatCurrency(summary.outstandingIncome) },
     { label: "Bookings this month", value: String(summary.bookingCount) },
   ];
-
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {cards.map((card) => (

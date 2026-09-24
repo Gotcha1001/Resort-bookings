@@ -39,9 +39,7 @@ function SummaryRow({ label, value, strong = false }: SummaryRowProps) {
     <div className="flex justify-between">
       <span className="text-stone-500">{label}</span>
       <span
-        className={`text-stone-900 dark:text-stone-100 ${
-          strong ? "font-semibold" : "font-medium"
-        }`}
+        className={`text-stone-900 dark:text-stone-100 ${strong ? "font-semibold" : "font-medium"}`}
       >
         {value}
       </span>
@@ -50,72 +48,69 @@ function SummaryRow({ label, value, strong = false }: SummaryRowProps) {
 }
 
 interface BookingFormProps {
-  venue: Doc<"venues">;
+  room: Doc<"rooms">;
   bookings: ReadonlyArray<Doc<"bookings">>;
   initialStartDate: number | null;
-  initialNumberOfDays: number;
+  initialNumberOfNights: number;
   onSuccess: () => void;
 }
 
 // Lives inside DialogContent, which unmounts when the dialog closes, so this
 // state resets (and re-reads the calendar selection) on every open.
 function BookingForm({
-  venue,
+  room,
   bookings,
   initialStartDate,
-  initialNumberOfDays,
+  initialNumberOfNights,
   onSuccess,
 }: BookingFormProps) {
-  const [customerName, setCustomerName] = useState<string>("");
-  const [contactNumber, setContactNumber] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [numberOfDaysInput, setNumberOfDaysInput] = useState<string>(
-    String(initialNumberOfDays),
+  const [guestName, setGuestName] = useState<string>("");
+  const [guestPhone, setGuestPhone] = useState<string>("");
+  const [guestEmail, setGuestEmail] = useState<string>("");
+  const [numberOfNightsInput, setNumberOfNightsInput] = useState<string>(
+    String(initialNumberOfNights),
   );
   const [startDateInput, setStartDateInput] = useState<string>(
     toDateInputValue(initialStartDate ?? startOfDay(new Date())),
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  const createBooking = useMutation(api.bookings.create);
+  const createBooking = useMutation(api.bookings.createManual);
 
   // null means "not a valid value right now" (e.g. the field was cleared).
   const startDate = parseDateInput(startDateInput);
-  const numberOfDays = parseNights(numberOfDaysInput);
+  const numberOfNights = parseNights(numberOfNightsInput);
   const endDate =
-    startDate !== null && numberOfDays !== null
-      ? calculateEndDate(startDate, numberOfDays)
+    startDate !== null && numberOfNights !== null
+      ? calculateEndDate(startDate, numberOfNights)
       : null;
   const amount =
-    numberOfDays !== null
-      ? calculateAmount(numberOfDays, venue.pricePerDay)
+    numberOfNights !== null
+      ? calculateAmount(numberOfNights, room.pricePerNight)
       : 0;
-
   const hasClash =
     startDate !== null &&
     endDate !== null &&
     bookings.some(
       (booking) =>
-        booking.status === "active" &&
+        (booking.status === "active" || booking.status === "pending_payment") &&
         rangesOverlap(startDate, endDate, booking.startDate, booking.endDate),
     );
-
   const canSubmit =
-    startDate !== null && numberOfDays !== null && !hasClash && !isSubmitting;
+    startDate !== null && numberOfNights !== null && !hasClash && !isSubmitting;
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
-    if (startDate === null || numberOfDays === null) {
+    if (startDate === null || numberOfNights === null) {
       toast.error("Choose a valid check-in date and number of nights");
       return;
     }
-    if (!customerName.trim()) {
-      toast.error("Enter the customer's name");
+    if (!guestName.trim()) {
+      toast.error("Enter the guest's name");
       return;
     }
-    if (!contactNumber.trim()) {
+    if (!guestPhone.trim()) {
       toast.error("Enter a contact number");
       return;
     }
@@ -123,18 +118,17 @@ function BookingForm({
       toast.error("Those dates overlap an existing booking");
       return;
     }
-
     setIsSubmitting(true);
     try {
       await createBooking({
-        venueId: venue._id,
-        customerName,
-        contactNumber,
-        email: email.trim() || undefined,
-        numberOfDays,
+        roomId: room._id,
+        guestName,
+        guestPhone,
+        guestEmail: guestEmail.trim() || undefined,
+        numberOfNights,
         startDate,
       });
-      toast.success(`Booking confirmed for ${customerName.trim()}`);
+      toast.success(`Booking confirmed for ${guestName.trim()}`);
       onSuccess();
     } catch (error) {
       toast.error(
@@ -145,39 +139,37 @@ function BookingForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="customer-name">Customer name</Label>
+        <Label htmlFor="guest-name">Guest name</Label>
         <Input
-          id="customer-name"
-          value={customerName}
-          onChange={(event) => setCustomerName(event.target.value)}
+          id="guest-name"
+          value={guestName}
+          onChange={(event) => setGuestName(event.target.value)}
           required
         />
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="contact-number">Contact number</Label>
+          <Label htmlFor="guest-phone">Contact number</Label>
           <Input
-            id="contact-number"
+            id="guest-phone"
             type="tel"
-            value={contactNumber}
-            onChange={(event) => setContactNumber(event.target.value)}
+            value={guestPhone}
+            onChange={(event) => setGuestPhone(event.target.value)}
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="customer-email">Email (optional)</Label>
+          <Label htmlFor="guest-email">Email (optional)</Label>
           <Input
-            id="customer-email"
+            id="guest-email"
             type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            value={guestEmail}
+            onChange={(event) => setGuestEmail(event.target.value)}
           />
         </div>
       </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="start-date">Check-in date</Label>
@@ -190,19 +182,18 @@ function BookingForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="number-of-days">Number of nights</Label>
+          <Label htmlFor="number-of-nights">Number of nights</Label>
           <Input
-            id="number-of-days"
+            id="number-of-nights"
             type="number"
             min={1}
             step={1}
-            value={numberOfDaysInput}
-            onChange={(event) => setNumberOfDaysInput(event.target.value)}
+            value={numberOfNightsInput}
+            onChange={(event) => setNumberOfNightsInput(event.target.value)}
             required
           />
         </div>
       </div>
-
       <div className="space-y-1 rounded-lg bg-stone-50 p-3 text-sm dark:bg-stone-900">
         <SummaryRow
           label="Check-in"
@@ -214,64 +205,62 @@ function BookingForm({
         />
         <SummaryRow
           label="Nights"
-          value={numberOfDays !== null ? String(numberOfDays) : "—"}
+          value={numberOfNights !== null ? String(numberOfNights) : "—"}
         />
         <SummaryRow
           label="Amount due"
-          value={numberOfDays !== null ? formatCurrency(amount) : "—"}
+          value={numberOfNights !== null ? formatCurrency(amount) : "—"}
           strong
         />
       </div>
-
       {hasClash && (
         <p className="text-sm text-red-600 dark:text-red-400">
           These dates overlap an existing booking. Pick different dates on the
           calendar.
         </p>
       )}
-
       <DialogFooter>
         <Button type="submit" disabled={!canSubmit}>
-          {isSubmitting ? "Booking…" : "Confirm booking"}
+          {isSubmitting ? "Booking..." : "Confirm booking"}
         </Button>
       </DialogFooter>
     </form>
   );
 }
 
-interface BookingFormDialogProps {
-  venue: Doc<"venues">;
+interface AdminBookingFormDialogProps {
+  room: Doc<"rooms">;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Check-in day picked on the calendar (local midnight), if any. */
   initialStartDate: number | null;
-  initialNumberOfDays: number;
-  /** Existing bookings for this venue, used to warn about clashes. */
+  initialNumberOfNights: number;
+  /** Existing bookings for this room, used to warn about clashes. */
   bookings: ReadonlyArray<Doc<"bookings">>;
   /** Called after a booking is saved, so the caller can clear the selection. */
   onBooked: () => void;
 }
 
-export function BookingFormDialog({
-  venue,
+export function AdminBookingFormDialog({
+  room,
   open,
   onOpenChange,
   initialStartDate,
-  initialNumberOfDays,
+  initialNumberOfNights,
   bookings,
   onBooked,
-}: BookingFormDialogProps) {
+}: AdminBookingFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Book {venue.name}</DialogTitle>
+          <DialogTitle>Book {room.name}</DialogTitle>
         </DialogHeader>
         <BookingForm
-          venue={venue}
+          room={room}
           bookings={bookings}
           initialStartDate={initialStartDate}
-          initialNumberOfDays={initialNumberOfDays}
+          initialNumberOfNights={initialNumberOfNights}
           onSuccess={() => {
             onOpenChange(false);
             onBooked();
