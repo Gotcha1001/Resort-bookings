@@ -1,3 +1,5 @@
+// components/PublicRoomCard.tsx
+import Image from "next/image";
 import Link from "next/link";
 import { ImageOff, Users } from "lucide-react";
 import type { Doc } from "@/convex/_generated/dataModel";
@@ -5,40 +7,56 @@ import { formatCurrency } from "@/lib/format";
 
 interface PublicRoomCardProps {
   room: Doc<"rooms">;
+  // Pass true for the cards visible without scrolling (the first 2-3 on
+  // mobile, since cards stack in a single column there). That tells
+  // next/image to preload the image with fetchpriority="high" instead of
+  // lazy-loading it, which is what actually fixes "images load slowly on
+  // mobile" — lazy-loading is correct for every card below the fold.
+  priority?: boolean;
 }
 
-export function PublicRoomCard({ room }: PublicRoomCardProps) {
+export function PublicRoomCard({
+  room,
+  priority = false,
+}: PublicRoomCardProps) {
   return (
     <Link
       href={`/rooms/${room._id}`}
-      className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-teal-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-700"
+      className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition hover:border-accent hover:shadow-md dark:bg-surface"
     >
       {room.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL
-        <img
-          src={room.imageUrl}
-          alt={room.name}
-          className="h-48 w-full object-cover transition group-hover:scale-[1.02]"
-        />
+        <div className="relative h-48 w-full overflow-hidden">
+          <Image
+            src={room.imageUrl}
+            alt={room.name}
+            fill
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            // One column on mobile, two on small tablets, a third on desktop
+            // — matches the grid in the pages that render this card.
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition group-hover:scale-[1.02]"
+          />
+        </div>
       ) : (
-        <div className="flex h-48 w-full items-center justify-center bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
+        <div className="flex h-48 w-full items-center justify-center bg-muted/30 text-muted-foreground">
           <ImageOff size={32} />
         </div>
       )}
       <div className="flex flex-1 flex-col justify-between p-5">
         <div>
           <div className="flex items-start justify-between gap-3">
-            <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+            <h3 className="text-lg font-semibold text-foreground">
               {room.name}
             </h3>
-            <span className="shrink-0 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-teal-700 dark:bg-teal-950 dark:text-teal-300">
+            <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-accent">
               {room.roomType}
             </span>
           </div>
-          <p className="mt-2 line-clamp-2 text-sm text-stone-600 dark:text-stone-400">
+          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
             {room.description || "No description yet."}
           </p>
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Users size={13} />
             Sleeps up to {room.maxGuests}
           </div>
@@ -47,24 +65,24 @@ export function PublicRoomCard({ room }: PublicRoomCardProps) {
               {room.amenities.slice(0, 4).map((amenity) => (
                 <span
                   key={amenity}
-                  className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600 dark:bg-stone-800 dark:text-stone-300"
+                  className="rounded-full bg-muted/30 px-2 py-0.5 text-xs text-muted-foreground"
                 >
                   {amenity}
                 </span>
               ))}
               {room.amenities.length > 4 && (
-                <span className="text-xs text-stone-400">
+                <span className="text-xs text-muted-foreground">
                   +{room.amenities.length - 4} more
                 </span>
               )}
             </div>
           )}
         </div>
-        <div className="mt-4 flex items-baseline gap-1 border-t border-stone-100 pt-3 text-sm dark:border-stone-800">
-          <span className="font-semibold text-stone-900 dark:text-stone-50">
+        <div className="mt-4 flex items-baseline gap-1 border-t border-border pt-3 text-sm">
+          <span className="font-semibold text-foreground">
             {formatCurrency(room.pricePerNight)}
           </span>
-          <span className="font-normal text-stone-400">/ night</span>
+          <span className="font-normal text-muted-foreground">/ night</span>
         </div>
       </div>
     </Link>

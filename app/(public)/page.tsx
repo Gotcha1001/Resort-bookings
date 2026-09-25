@@ -50,28 +50,24 @@ export default function PublicHomePage() {
   const featuredRooms = rooms?.slice(0, 3) ?? [];
 
   return (
-    <main className="min-h-screen bg-stone-50 dark:bg-stone-950">
+    <main className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 pb-20 pt-24 text-center">
         <div className="relative z-10 max-w-3xl">
-          <span className="text-sm font-medium uppercase tracking-wider text-teal-600 dark:text-teal-400">
+          <span className="text-sm font-medium uppercase tracking-wider text-accent">
             Welcome
           </span>
 
-          <h1 className="mt-4 text-5xl font-black tracking-tight text-stone-900 dark:text-stone-50 md:text-6xl">
+          <h1 className="mt-4 text-5xl font-black tracking-tight text-foreground md:text-6xl">
             {resortName}
           </h1>
 
-          <p className="mx-auto mt-5 max-w-xl text-lg text-stone-600 dark:text-stone-300">
+          <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
             {tagline}
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Button
-              asChild
-              size="lg"
-              className="bg-teal-600 px-10 py-6 text-lg text-white shadow-lg hover:bg-teal-500"
-            >
+            <Button asChild size="lg" className="px-10 py-6 text-lg shadow-lg">
               <Link href="/rooms">Browse rooms & cottages →</Link>
             </Button>
 
@@ -79,7 +75,7 @@ export default function PublicHomePage() {
               asChild
               variant="outline"
               size="lg"
-              className="border-stone-300 px-8 py-6 text-lg dark:border-stone-700"
+              className="px-8 py-6 text-lg"
             >
               <Link href="/about">About the resort</Link>
             </Button>
@@ -94,16 +90,16 @@ export default function PublicHomePage() {
             <Link
               key={item.title}
               href={item.href}
-              className="group rounded-2xl border border-stone-200 bg-white p-6 text-left shadow-sm transition hover:border-teal-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-700"
+              className="group rounded-2xl border border-border bg-white p-6 text-left shadow-sm transition hover:border-accent hover:shadow-md dark:bg-surface"
             >
               <item.icon
-                className="text-teal-600 transition group-hover:scale-110 dark:text-teal-400"
+                className="text-accent transition group-hover:scale-110"
                 size={28}
               />
-              <h3 className="mt-3 text-lg font-semibold text-stone-900 dark:text-stone-50">
+              <h3 className="mt-3 text-lg font-semibold text-foreground">
                 {item.title}
               </h3>
-              <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">
+              <p className="mt-2 text-sm text-muted-foreground">
                 {item.description}
               </p>
             </Link>
@@ -116,18 +112,14 @@ export default function PublicHomePage() {
         <section className="mx-auto max-w-6xl px-6 pb-24">
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-50">
+              <h2 className="text-2xl font-bold text-foreground">
                 Featured stays
               </h2>
-              <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 A few of our rooms and cottages available to book.
               </p>
             </div>
-            <Button
-              asChild
-              variant="ghost"
-              className="text-teal-700 dark:text-teal-400"
-            >
+            <Button asChild variant="ghost" className="text-accent">
               <Link href="/rooms">View all →</Link>
             </Button>
           </div>
@@ -143,8 +135,8 @@ export default function PublicHomePage() {
       {/* Empty state when no rooms exist yet */}
       {rooms !== undefined && rooms.length === 0 && (
         <section className="mx-auto max-w-xl px-6 pb-24 text-center">
-          <div className="rounded-2xl border border-dashed border-stone-300 p-10 dark:border-stone-700">
-            <p className="text-stone-600 dark:text-stone-300">
+          <div className="rounded-2xl border border-dashed border-border p-10">
+            <p className="text-muted-foreground">
               Rooms and cottages will appear here once the resort has added
               them.
             </p>

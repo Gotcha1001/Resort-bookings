@@ -81,19 +81,19 @@ export function GeneralSettingsForm() {
   }
 
   if (settings === undefined) {
-    return <p className="text-sm text-stone-500">Loading settings…</p>;
+    return <p className="text-sm text-muted-foreground">Loading settings…</p>;
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900"
+      className="space-y-5 rounded-2xl border border-border bg-white p-6 dark:bg-surface"
     >
       <div>
-        <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+        <h2 className="text-lg font-semibold text-foreground">
           Resort details
         </h2>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           The name and logo appear in the public navbar, admin navbar and admin
           sidebar.
         </p>
@@ -122,7 +122,7 @@ export function GeneralSettingsForm() {
           className="mt-1.5"
           maxLength={200}
         />
-        <p className="mt-1 text-xs text-stone-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           Shown on the public homepage and About page under the resort name.
         </p>
       </div>
@@ -139,16 +139,16 @@ export function GeneralSettingsForm() {
             disabled={isSaving}
           />
         </div>
-        <p className="mt-1 text-xs text-stone-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           Leave empty to use the default icon.
         </p>
       </div>
 
-      <div className="border-t border-stone-200 pt-5 dark:border-stone-800">
-        <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+      <div className="border-t border-border pt-5">
+        <h3 className="text-base font-semibold text-foreground">
           Contact details
         </h3>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           Shown to guests on the Activities, Amenities and About pages. Leave a
           field blank to hide it.
         </p>
@@ -194,11 +194,7 @@ export function GeneralSettingsForm() {
         />
       </div>
 
-      <Button
-        type="submit"
-        disabled={isSaving}
-        className="w-full bg-teal-600 text-white hover:bg-teal-500 sm:w-auto"
-      >
+      <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
         {isSaving ? "Saving…" : "Save settings"}
       </Button>
     </form>

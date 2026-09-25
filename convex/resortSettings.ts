@@ -4,6 +4,7 @@ import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { MutationCtx } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
+import { COLOR_THEME_IDS } from "@/lib/colorThemes";
 
 async function requireAdmin(ctx: MutationCtx): Promise<Doc<"users">> {
   const identity = await ctx.auth.getUserIdentity();
@@ -52,6 +53,7 @@ export const update = mutation({
     aboutHeading: v.optional(v.string()),
     aboutStory: v.optional(v.string()),
     aboutLocationText: v.optional(v.string()),
+    colorTheme: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const admin = await requireAdmin(ctx);
@@ -76,6 +78,12 @@ export const update = mutation({
     if (args.aboutLocationText !== undefined) {
       assertMaxLength("Location text", args.aboutLocationText, 1000);
     }
+    if (
+      args.colorTheme !== undefined &&
+      !COLOR_THEME_IDS.includes(args.colorTheme)
+    ) {
+      throw new Error("Unknown color theme");
+    }
 
     const patch: Partial<Omit<Doc<"resortSettings">, "_id" | "_creationTime">> =
       {};
@@ -96,6 +104,7 @@ export const update = mutation({
     if (args.logoPublicId !== undefined) {
       patch.logoPublicId = args.logoPublicId ?? undefined;
     }
+    if (args.colorTheme !== undefined) patch.colorTheme = args.colorTheme;
 
     // Logo replaced or removed -> delete the old file from Cloudinary.
     const oldLogoId = existing?.logoPublicId;

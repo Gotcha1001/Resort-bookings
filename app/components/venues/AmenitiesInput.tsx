@@ -1,3 +1,4 @@
+// components/venues/AmenitiesInput.tsx
 "use client";
 
 import { useState, type KeyboardEvent } from "react";
@@ -53,13 +54,13 @@ export function AmenitiesInput({ amenities, onChange }: AmenitiesInputProps) {
           {amenities.map((amenity) => (
             <span
               key={amenity}
-              className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-stone-100 px-3 py-1 text-xs text-stone-700 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200"
+              className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/30 px-3 py-1 text-xs text-foreground"
             >
               {amenity}
               <button
                 type="button"
                 onClick={() => removeAmenity(amenity)}
-                className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-100"
+                className="text-muted-foreground hover:text-foreground"
                 aria-label={`Remove ${amenity}`}
               >
                 <X size={12} />

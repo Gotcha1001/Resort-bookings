@@ -89,16 +89,16 @@ export function BookingTable({
 
   if (bookings.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500 dark:border-stone-700">
+      <p className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
         {emptyMessage}
       </p>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-800">
+    <div className="overflow-x-auto rounded-xl border border-border bg-white dark:bg-surface">
       <table className="w-full text-left text-sm">
-        <thead className="bg-stone-50 text-xs uppercase tracking-wide text-stone-500 dark:bg-stone-900 dark:text-stone-400">
+        <thead className="bg-white text-xs uppercase tracking-wide text-muted-foreground dark:bg-surface">
           <tr>
             {showRoomColumn && <th className="px-4 py-3 font-medium">Room</th>}
             <th className="px-4 py-3 font-medium">Guest</th>
@@ -110,7 +110,7 @@ export function BookingTable({
             <th className="px-4 py-3 font-medium text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+        <tbody className="divide-y divide-border">
           {bookings.map((booking) => {
             const isBusy = pendingId === booking._id;
             // Active bookings can be cancelled / payment toggled.
@@ -123,32 +123,32 @@ export function BookingTable({
             return (
               <tr key={booking._id}>
                 {showRoomColumn && (
-                  <td className="px-4 py-3 font-medium text-stone-900 dark:text-stone-100">
+                  <td className="px-4 py-3 font-medium text-foreground">
                     {booking.roomName ?? "—"}
                   </td>
                 )}
                 <td className="px-4 py-3">
-                  <div className="font-medium text-stone-900 dark:text-stone-100">
+                  <div className="font-medium text-foreground">
                     {booking.guestName}
                   </div>
                   {booking.guestEmail && (
-                    <div className="text-xs text-stone-400">
+                    <div className="text-xs text-muted-foreground">
                       {booking.guestEmail}
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-3 text-stone-600 dark:text-stone-300">
+                <td className="px-4 py-3 text-muted-foreground">
                   {booking.guestPhone}
                 </td>
-                <td className="px-4 py-3 text-stone-600 dark:text-stone-300">
+                <td className="px-4 py-3 text-muted-foreground">
                   <div>{formatDate(booking.startDate)}</div>
-                  <div className="text-xs text-stone-400">
+                  <div className="text-xs text-muted-foreground/80">
                     to {formatDate(booking.endDate)}
                   </div>
                 </td>
-                <td className="px-4 py-3 font-medium text-stone-900 dark:text-stone-100">
+                <td className="px-4 py-3 font-medium text-foreground">
                   {formatCurrency(booking.amount)}
-                  <div className="text-xs font-normal text-stone-400">
+                  <div className="text-xs font-normal text-muted-foreground">
                     {booking.numberOfNights}{" "}
                     {booking.numberOfNights === 1 ? "night" : "nights"}
                   </div>

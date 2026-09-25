@@ -1,3 +1,4 @@
+// components/venues/AdminBookingFormDialog.tsx
 "use client";
 
 import { useState, type FormEvent } from "react";
@@ -37,9 +38,9 @@ interface SummaryRowProps {
 function SummaryRow({ label, value, strong = false }: SummaryRowProps) {
   return (
     <div className="flex justify-between">
-      <span className="text-stone-500">{label}</span>
+      <span className="text-muted-foreground">{label}</span>
       <span
-        className={`text-stone-900 dark:text-stone-100 ${strong ? "font-semibold" : "font-medium"}`}
+        className={`text-foreground ${strong ? "font-semibold" : "font-medium"}`}
       >
         {value}
       </span>
@@ -194,7 +195,7 @@ function BookingForm({
           />
         </div>
       </div>
-      <div className="space-y-1 rounded-lg bg-stone-50 p-3 text-sm dark:bg-stone-900">
+      <div className="space-y-1 rounded-lg border border-border bg-muted/20 p-3 text-sm dark:bg-muted/10">
         <SummaryRow
           label="Check-in"
           value={startDate !== null ? formatDate(startDate) : "—"}
@@ -214,7 +215,7 @@ function BookingForm({
         />
       </div>
       {hasClash && (
-        <p className="text-sm text-red-600 dark:text-red-400">
+        <p className="text-sm text-destructive">
           These dates overlap an existing booking. Pick different dates on the
           calendar.
         </p>

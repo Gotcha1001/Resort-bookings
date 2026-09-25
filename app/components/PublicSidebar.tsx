@@ -1,4 +1,4 @@
-// components/AppSidebar.tsx
+// components/PublicSidebar.tsx
 "use client";
 
 import Link from "next/link";
@@ -6,10 +6,12 @@ import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import {
-  LayoutDashboard,
+  Home,
   BedDouble,
-  CalendarDays,
-  Settings,
+  Waves,
+  Trees,
+  MapPin,
+  CalendarCheck,
 } from "lucide-react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -26,14 +28,15 @@ import {
 import Image from "next/image";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/rooms", label: "Rooms", icon: BedDouble },
-  { href: "/bookings", label: "Bookings", icon: CalendarDays },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/rooms", label: "Rooms & cottages", icon: BedDouble },
+  { href: "/amenities", label: "Amenities", icon: Waves },
+  { href: "/activities", label: "Things to do", icon: Trees },
+  { href: "/about", label: "About us", icon: MapPin },
 ] as const;
 
-export function AppSidebar() {
-  const { user } = useUser();
+export function PublicSidebar() {
+  const { user, isSignedIn } = useUser();
   const pathname = usePathname();
   const settings = useQuery(api.resortSettings.get);
 
@@ -68,7 +71,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>Explore</SidebarGroupLabel>
           <SidebarMenu>
             {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
               <SidebarMenuItem key={href}>
@@ -85,6 +88,20 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+
+            {isSignedIn && (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith("/my-bookings")}
+                >
+                  <Link href="/my-bookings" className="flex items-center gap-2">
+                    <CalendarCheck size={16} />
+                    <span>My bookings</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

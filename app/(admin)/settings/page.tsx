@@ -4,12 +4,13 @@
 import { AboutSettingsForm } from "@/app/components/settings/AboutSettingsForm";
 import { ContentManager } from "@/app/components/settings/ContentManager";
 import { GeneralSettingsForm } from "@/app/components/settings/GeneralSettingsForm";
+import { ThemeColorPicker } from "@/app/components/settings/ThemeColorPicker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Ties together the settings components: resort name/logo/contact details
-// (General), the About page copy + "what we care about" cards (About), and
-// the Activities / Amenities card lists that also feed the hero carousels
-// on their public pages.
+// (General), the site color theme (Theme), the About page copy + "what we
+// care about" cards (About), and the Activities / Amenities card lists that
+// also feed the hero carousels on their public pages.
 export default function AdminSettingsPage() {
   return (
     <div className="space-y-6">
@@ -18,14 +19,15 @@ export default function AdminSettingsPage() {
           Settings
         </h1>
         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-          Manage your resort name and contact details, and the content shown on
-          the public Activities, Amenities and About pages.
+          Manage your resort name and contact details, the site color theme, and
+          the content shown on the public Activities, Amenities and About pages.
         </p>
       </div>
 
       <Tabs defaultValue="general">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="theme">Theme</TabsTrigger>
           <TabsTrigger value="about">About page</TabsTrigger>
           <TabsTrigger value="activities">Activities</TabsTrigger>
           <TabsTrigger value="amenities">Amenities</TabsTrigger>
@@ -33,6 +35,10 @@ export default function AdminSettingsPage() {
 
         <TabsContent value="general" className="mt-6">
           <GeneralSettingsForm />
+        </TabsContent>
+
+        <TabsContent value="theme" className="mt-6">
+          <ThemeColorPicker />
         </TabsContent>
 
         <TabsContent value="about" className="mt-6 space-y-8">

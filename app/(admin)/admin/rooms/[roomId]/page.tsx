@@ -12,6 +12,7 @@ import { formatCurrency } from "@/lib/format";
 import { RoomFormDialog } from "@/app/components/RoomFormDialog";
 import { BookingCalendar } from "@/app/components/calendar/BookingCalendar";
 import { BookingTable } from "@/app/components/bookings/BookingTable";
+import Image from "next/image";
 
 interface PageProps {
   params: Promise<{ roomId: string }>;
@@ -53,12 +54,15 @@ export default function AdminRoomDetailPage({ params }: PageProps) {
       {/* Header: the actual room/cottage as it was uploaded — photo first,
           so an admin can confirm at a glance what the customer sees. */}
       {room.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={room.imageUrl}
-          alt={room.name}
-          className="h-64 w-full rounded-2xl object-cover sm:h-80"
-        />
+        <div className="relative h-64 w-full overflow-hidden rounded-2xl sm:h-80">
+          <Image
+            src={room.imageUrl}
+            alt={room.name}
+            fill
+            className="object-cover"
+            sizes="(min-width: 640px) 100vw, 100vw"
+          />
+        </div>
       ) : (
         <div className="flex h-64 w-full items-center justify-center rounded-2xl bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600 sm:h-80">
           <ImageOff size={40} />

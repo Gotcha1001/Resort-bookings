@@ -1,16 +1,23 @@
 // app/(public)/layout.tsx
+"use client";
 
-import { PublicNavbar } from "../components/PublicNavbar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import Navbar from "../components/Navbar";
+import { PublicSidebar } from "../components/PublicSidebar";
 
+// app/(public)/layout.tsx
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-full flex-col bg-stone-50 dark:bg-stone-950">
-      <PublicNavbar />
-      <main className="flex-1">{children}</main>
-    </div>
+    <SidebarProvider>
+      <PublicSidebar />
+      <SidebarInset>
+        <Navbar homeHref="/" />
+        <main className="flex-1 overflow-auto">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

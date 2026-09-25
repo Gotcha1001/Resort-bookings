@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface CarouselSlide {
@@ -48,12 +49,14 @@ export function ContentCarousel({
       className={`relative w-full overflow-hidden rounded-2xl ${heightClass}`}
     >
       {slides.map((slide, i) => (
-        // eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL
-        <img
+        <Image
           key={slide._id}
           src={slide.imageUrl}
           alt={slide.title}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+          fill
+          priority={i === 0}
+          sizes="100vw"
+          className={`object-cover transition-opacity duration-700 ${
             i === index ? "opacity-100" : "opacity-0"
           }`}
         />

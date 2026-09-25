@@ -1,3 +1,5 @@
+// components/dashboard/FinancialSummaryCards.tsx
+
 import { formatCurrency } from "@/lib/format";
 
 export interface FinancialSummary {
@@ -30,7 +32,7 @@ export function FinancialSummaryCards({
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900"
+          className="rounded-2xl border border-border bg-white p-5 dark:bg-surface"
         >
           <p className="text-sm text-stone-500 dark:text-stone-400">
             {card.label}

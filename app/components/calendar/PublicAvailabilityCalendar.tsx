@@ -59,7 +59,6 @@ export function PublicAvailabilityCalendar({
   const todayStart = startOfDay(new Date());
   const { start, end } = selection;
 
-  // While only the start is picked, preview the stay up to the hovered day.
   const previewEnd =
     start !== null && end === null && hoveredDay !== null && hoveredDay > start
       ? hoveredDay
@@ -67,9 +66,9 @@ export function PublicAvailabilityCalendar({
   const highlightEnd = end ?? previewEnd;
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900">
+    <div className="rounded-2xl border border-border bg-white p-5 dark:bg-surface">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+        <h3 className="text-base font-semibold text-foreground">
           {monthLabel}
         </h3>
         <div className="flex items-center gap-1">
@@ -95,7 +94,7 @@ export function PublicAvailabilityCalendar({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs text-stone-400">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
         {WEEKDAY_LABELS.map((label) => (
           <div key={label} className="py-1">
             {label}
@@ -126,17 +125,15 @@ export function PublicAvailabilityCalendar({
 
           let stateClasses: string;
           if (isPast) {
-            stateClasses =
-              "cursor-not-allowed text-stone-300 dark:text-stone-700";
+            stateClasses = "cursor-not-allowed text-muted-foreground/40";
           } else if (isBooked) {
             stateClasses =
               "cursor-not-allowed bg-amber-100 text-amber-900 line-through dark:bg-amber-950 dark:text-amber-300";
           } else if (isStart || isEnd) {
-            stateClasses =
-              "bg-teal-600 text-white dark:bg-teal-500 dark:text-stone-950";
+            stateClasses = "bg-accent text-accent-foreground";
           } else if (isInRange) {
             stateClasses =
-              "bg-teal-100 text-teal-900 dark:bg-teal-900/50 dark:text-teal-100";
+              "bg-accent/15 text-accent dark:bg-accent/25 dark:text-accent";
           } else {
             stateClasses =
               "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/50";
@@ -153,8 +150,8 @@ export function PublicAvailabilityCalendar({
               aria-label={`${formatDate(dayStart)}, ${
                 isPast ? "unavailable" : isBooked ? "booked" : "available"
               }`}
-              className={`flex h-12 flex-col items-center justify-center rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${stateClasses} ${
-                isToday && !isStart && !isEnd ? "ring-2 ring-teal-500" : ""
+              className={`flex h-12 flex-col items-center justify-center rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${stateClasses} ${
+                isToday && !isStart && !isEnd ? "ring-2 ring-accent" : ""
               }`}
             >
               <span className="font-medium">{day.getDate()}</span>
@@ -170,8 +167,8 @@ export function PublicAvailabilityCalendar({
       </div>
 
       {range ? (
-        <div className="mt-4 flex flex-col gap-3 rounded-lg bg-teal-50 p-3 text-sm dark:bg-teal-950/40 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-stone-700 dark:text-stone-200">
+        <div className="mt-4 flex flex-col gap-3 rounded-lg bg-accent/10 p-3 text-sm dark:bg-accent/15 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-foreground">
             {end === null ? (
               <>
                 Check-in{" "}
@@ -212,12 +209,12 @@ export function PublicAvailabilityCalendar({
           </div>
         </div>
       ) : (
-        <p className="mt-4 text-xs text-stone-500">
+        <p className="mt-4 text-xs text-muted-foreground">
           Tap a green day for your check-in, then tap your last night.
         </p>
       )}
 
-      <div className="mt-4 flex gap-4 text-xs text-stone-500">
+      <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /> Available
         </span>
@@ -225,7 +222,7 @@ export function PublicAvailabilityCalendar({
           <span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> Booked
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-teal-500" /> Your stay
+          <span className="h-2.5 w-2.5 rounded-full bg-accent" /> Your stay
         </span>
       </div>
     </div>

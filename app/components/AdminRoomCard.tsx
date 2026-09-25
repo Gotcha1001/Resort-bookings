@@ -1,3 +1,4 @@
+// components/venues/AdminRoomCard.tsx
 "use client";
 
 import Link from "next/link";
@@ -9,6 +10,7 @@ import type { Doc } from "@/convex/_generated/dataModel";
 import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { RoomFormDialog } from "./RoomFormDialog";
+import Image from "next/image";
 
 interface AdminRoomCardProps {
   room: Doc<"rooms">;
@@ -40,17 +42,20 @@ export function AdminRoomCard({
   }
 
   return (
-    <div className="flex flex-col justify-between overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm dark:border-stone-800 dark:bg-stone-900">
+    <div className="flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-white shadow-sm dark:bg-surface">
       <Link href={`/admin/rooms/${room._id}`}>
         {room.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL
-          <img
-            src={room.imageUrl}
-            alt={room.name}
-            className="h-40 w-full object-cover"
-          />
+          <div className="relative h-40 w-full">
+            <Image
+              src={room.imageUrl}
+              alt={room.name}
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
         ) : (
-          <div className="flex h-40 w-full items-center justify-center bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
+          <div className="flex h-40 w-full items-center justify-center bg-muted/30 text-muted-foreground">
             <ImageOff size={28} />
           </div>
         )}
@@ -59,18 +64,18 @@ export function AdminRoomCard({
         <div>
           <div className="flex items-start justify-between gap-3">
             <Link href={`/admin/rooms/${room._id}`}>
-              <h3 className="text-lg font-semibold text-stone-900 hover:text-teal-600 dark:text-stone-50">
+              <h3 className="text-lg font-semibold text-foreground hover:text-accent">
                 {room.name}
               </h3>
             </Link>
             <div className="flex shrink-0 flex-col items-end gap-1">
-              <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+              <span className="rounded-full bg-muted/30 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
                 {room.roomType}
               </span>
               <span
                 className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                   room.isArchived
-                    ? "bg-stone-200 text-stone-600 dark:bg-stone-700 dark:text-stone-300"
+                    ? "bg-muted/40 text-muted-foreground"
                     : isOccupied
                       ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
                       : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
@@ -84,14 +89,16 @@ export function AdminRoomCard({
               </span>
             </div>
           </div>
-          <p className="mt-2 line-clamp-2 text-sm text-stone-600 dark:text-stone-400">
+          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
             {room.description || "No description yet."}
           </p>
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3 text-sm dark:border-stone-800">
-          <span className="font-medium text-stone-900 dark:text-stone-50">
+        <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-sm">
+          <span className="font-medium text-foreground">
             {formatCurrency(room.pricePerNight)}
-            <span className="ml-1 font-normal text-stone-400">/ night</span>
+            <span className="ml-1 font-normal text-muted-foreground">
+              / night
+            </span>
           </span>
           <div className="flex gap-1.5">
             <RoomFormDialog
