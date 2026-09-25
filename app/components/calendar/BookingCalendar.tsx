@@ -98,9 +98,9 @@ export function BookingCalendar({
   const highlightEnd = end ?? previewEnd;
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900">
+    <div className="rounded-2xl border border-border bg-white p-5 dark:bg-surface">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+        <h3 className="text-base font-semibold text-foreground">
           {monthLabel}
         </h3>
         <div className="flex items-center gap-1">
@@ -126,7 +126,7 @@ export function BookingCalendar({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs text-stone-400">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
         {WEEKDAY_LABELS.map((label) => (
           <div key={label} className="py-1">
             {label}
@@ -160,16 +160,18 @@ export function BookingCalendar({
 
           let stateClasses: string;
           if (booking) {
+            // Semantic: booked stays amber regardless of brand theme
             stateClasses = readOnly
               ? "cursor-default bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300"
               : "cursor-not-allowed bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300";
           } else if (isStart || isEnd) {
-            stateClasses =
-              "bg-teal-600 text-white dark:bg-teal-500 dark:text-stone-950";
+            // Brand: selected endpoints follow the admin accent
+            stateClasses = "bg-accent text-accent-foreground";
           } else if (isInRange) {
             stateClasses =
-              "bg-teal-100 text-teal-900 dark:bg-teal-900/50 dark:text-teal-100";
+              "bg-accent/15 text-accent dark:bg-accent/25 dark:text-accent";
           } else if (readOnly) {
+            // Semantic: available stays emerald
             stateClasses =
               "cursor-default bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300";
           } else {
@@ -197,8 +199,8 @@ export function BookingCalendar({
                   ? `${booking.guestName} (${nightsLabel(booking.numberOfNights)})`
                   : "Available"
               }
-              className={`flex h-12 flex-col items-center justify-center rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${stateClasses} ${
-                isToday && !isStart && !isEnd ? "ring-2 ring-teal-500" : ""
+              className={`flex h-12 flex-col items-center justify-center rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${stateClasses} ${
+                isToday && !isStart && !isEnd ? "ring-2 ring-accent" : ""
               }`}
             >
               <span className="font-medium">{day.getDate()}</span>
@@ -219,13 +221,13 @@ export function BookingCalendar({
       </div>
 
       {readOnly ? (
-        <p className="mt-4 text-xs text-stone-500">
+        <p className="mt-4 text-xs text-muted-foreground">
           Amber days are booked. This calendar is view-only — bookings are made
           from the customer-facing room page.
         </p>
       ) : range ? (
-        <div className="mt-4 flex flex-col gap-3 rounded-lg bg-teal-50 p-3 text-sm dark:bg-teal-950/40 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-stone-700 dark:text-stone-200">
+        <div className="mt-4 flex flex-col gap-3 rounded-lg bg-accent/10 p-3 text-sm dark:bg-accent/15 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-foreground">
             {end === null ? (
               <>
                 Check-in{" "}
@@ -259,13 +261,13 @@ export function BookingCalendar({
           </div>
         </div>
       ) : (
-        <p className="mt-4 text-xs text-stone-500">
+        <p className="mt-4 text-xs text-muted-foreground">
           Click a green day to set the check-in, then click the last night of
           the stay.
         </p>
       )}
 
-      <div className="mt-4 flex gap-4 text-xs text-stone-500">
+      <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /> Available
         </span>
@@ -274,7 +276,7 @@ export function BookingCalendar({
         </span>
         {!readOnly && (
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-teal-500" /> Selected
+            <span className="h-2.5 w-2.5 rounded-full bg-accent" /> Selected
           </span>
         )}
       </div>

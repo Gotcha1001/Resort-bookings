@@ -62,19 +62,19 @@ export function AboutSettingsForm() {
   }
 
   if (settings === undefined) {
-    return <p className="text-sm text-stone-500">Loading…</p>;
+    return <p className="text-sm text-muted-foreground">Loading…</p>;
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900"
+      className="space-y-5 rounded-2xl border border-border bg-white p-6 dark:bg-surface"
     >
       <div>
-        <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+        <h2 className="text-lg font-semibold text-foreground">
           About page text
         </h2>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           Leave a field blank to show the default wording on the public page.
         </p>
       </div>
@@ -97,7 +97,7 @@ export function AboutSettingsForm() {
           <button
             type="button"
             onClick={() => setStory(defaultAboutStory(resortName))}
-            className="text-xs text-teal-600 underline dark:text-teal-400"
+            className="text-xs text-accent underline"
           >
             Start from example text
           </button>
@@ -111,7 +111,7 @@ export function AboutSettingsForm() {
           rows={9}
           maxLength={10000}
         />
-        <p className="mt-1 text-xs text-stone-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           Separate paragraphs with a blank line.
         </p>
       </div>
@@ -127,16 +127,12 @@ export function AboutSettingsForm() {
           rows={3}
           maxLength={1000}
         />
-        <p className="mt-1 text-xs text-stone-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           Your address from the General tab is shown next to this.
         </p>
       </div>
 
-      <Button
-        type="submit"
-        disabled={isSaving}
-        className="w-full bg-teal-600 text-white hover:bg-teal-500 sm:w-auto"
-      >
+      <Button type="submit" disabled={isSaving} className="w-full sm:w-auto">
         {isSaving ? "Saving…" : "Save About page"}
       </Button>
     </form>

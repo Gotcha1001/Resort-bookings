@@ -1,3 +1,4 @@
+// components/venues/RoomFormDialog.tsx  (or wherever it lives)
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
@@ -148,7 +149,7 @@ export function RoomFormDialog({ room, trigger }: RoomFormDialogProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button className="gap-2 bg-teal-600 text-white hover:bg-teal-500">
+          <Button className="gap-2">
             <Plus size={16} />
             Add room / cottage
           </Button>

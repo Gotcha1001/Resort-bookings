@@ -6,9 +6,11 @@ type BookingStatus = Doc<"bookings">["status"];
 const STATUS_STYLES: Record<BookingStatus, string> = {
   pending_payment:
     "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  active: "bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300",
+  // Brand-aligned: follows the admin-selected accent instead of hardcoded teal
+  active: "bg-accent/15 text-accent dark:bg-accent/20 dark:text-accent",
   cancelled: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
-  expired: "bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400",
+  expired:
+    "bg-muted/30 text-muted-foreground dark:bg-muted/20 dark:text-muted-foreground",
 };
 
 const STATUS_LABELS: Record<BookingStatus, string> = {

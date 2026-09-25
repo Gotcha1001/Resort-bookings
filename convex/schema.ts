@@ -21,6 +21,7 @@ export default defineSchema({
     tagline: v.optional(v.string()),
     logoUrl: v.optional(v.string()),
     logoPublicId: v.optional(v.string()),
+    colorTheme: v.optional(v.string()),
     // Contact details -- shown on Activities / Amenities / About pages.
     phone: v.optional(v.string()),
     email: v.optional(v.string()),

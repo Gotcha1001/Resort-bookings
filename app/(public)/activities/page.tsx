@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useQuery } from "convex/react";
 import { ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,12 +64,15 @@ export default function ActivitiesPage() {
               className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-teal-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-700"
             >
               {item.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className="h-40 w-full object-cover"
-                />
+                <div className="relative h-40 w-full">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className="flex h-40 w-full items-center justify-center bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
                   <ImageOff size={24} />

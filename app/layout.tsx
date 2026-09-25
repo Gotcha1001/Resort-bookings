@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import Provider from "./provider";
+import { ColorThemeProvider } from "./components/ColorThemeProvider";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -32,10 +33,12 @@ export default function RootLayout({
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ConvexClientProvider>
-              <Provider>
-                {children}
-                <Toaster richColors />
-              </Provider>
+              <ColorThemeProvider>
+                <Provider>
+                  {children}
+                  <Toaster richColors />
+                </Provider>
+              </ColorThemeProvider>
             </ConvexClientProvider>
           </ThemeProvider>
         </body>

@@ -4,6 +4,7 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export interface RoomImage {
   url: string;
@@ -89,12 +90,13 @@ export function RoomImageUpload({ value, onChange }: RoomImageUploadProps) {
         onChange={(event) => void handleFileSelected(event)}
       />
       {value ? (
-        <div className="relative w-full overflow-hidden rounded-md border">
-          {/* eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL */}
-          <img
+        <div className="relative h-40 w-full overflow-hidden rounded-md border">
+          <Image
             src={value.url}
             alt="Room or cottage photo"
-            className="h-40 w-full object-cover"
+            fill
+            className="object-cover"
+            sizes="100vw"
           />
           <Button
             type="button"

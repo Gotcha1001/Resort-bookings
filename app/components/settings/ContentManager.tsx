@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SECTION_TEXT, type ContentSection } from "@/lib/siteContent";
 import { ImageUploadField, type UploadedImage } from "./ImageUploadField";
+import Image from "next/image";
 
 interface ContentManagerProps {
   section: ContentSection;
@@ -99,10 +100,10 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
     <div className="space-y-4">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
         <div>
-          <h2 className="text-lg font-semibold capitalize text-stone-900 dark:text-stone-50">
+          <h2 className="text-lg font-semibold capitalize text-foreground">
             {plural}
           </h2>
-          <p className="mt-1 max-w-xl text-sm text-stone-500 dark:text-stone-400">
+          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
             {helpText}
           </p>
         </div>
@@ -113,11 +114,7 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
               View page
             </Link>
           </Button>
-          <Button
-            size="sm"
-            className="bg-teal-600 text-white hover:bg-teal-500"
-            onClick={() => setIsCreating(true)}
-          >
+          <Button size="sm" onClick={() => setIsCreating(true)}>
             <Plus size={14} className="mr-1.5" />
             Add {singular}
           </Button>
@@ -125,18 +122,14 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
       </div>
 
       {items === undefined ? (
-        <p className="text-sm text-stone-500">Loading…</p>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-stone-300 p-8 text-center dark:border-stone-700">
-          <p className="text-sm text-stone-600 dark:text-stone-300">
+        <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+          <p className="text-sm text-muted-foreground">
             No {plural} yet, so guests see an empty page.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Button
-              size="sm"
-              className="bg-teal-600 text-white hover:bg-teal-500"
-              onClick={() => setIsCreating(true)}
-            >
+            <Button size="sm" onClick={() => setIsCreating(true)}>
               Add your first {singular}
             </Button>
             <Button
@@ -150,7 +143,7 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
         </div>
       ) : (
         <>
-          <ul className="divide-y divide-stone-200 overflow-hidden rounded-2xl border border-stone-200 bg-white dark:divide-stone-800 dark:border-stone-800 dark:bg-stone-900">
+          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-white dark:bg-surface">
             {items.map((item, index) => {
               const busy = busyId === item._id;
               return (
@@ -161,30 +154,31 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
                   }`}
                 >
                   {item.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL
-                    <img
+                    <Image
                       src={item.imageUrl}
                       alt=""
+                      width={80}
+                      height={56}
                       className="h-14 w-20 shrink-0 rounded-md object-cover"
                     />
                   ) : (
-                    <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
+                    <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md bg-muted/30 text-muted-foreground">
                       <ImageOff size={18} />
                     </div>
                   )}
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-stone-900 dark:text-stone-50">
+                      <p className="truncate text-sm font-medium text-foreground">
                         {item.title}
                       </p>
                       {item.isArchived && (
-                        <span className="shrink-0 rounded-full bg-stone-200 px-2 py-0.5 text-[10px] font-medium text-stone-600 dark:bg-stone-700 dark:text-stone-300">
+                        <span className="shrink-0 rounded-full bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                           Hidden
                         </span>
                       )}
                     </div>
-                    <p className="line-clamp-1 text-xs text-stone-500 dark:text-stone-400">
+                    <p className="line-clamp-1 text-xs text-muted-foreground">
                       {item.description || "No description"}
                     </p>
                   </div>
@@ -267,7 +261,7 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-600 hover:text-red-700"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
                       disabled={busy}
                       aria-label="Delete"
                       onClick={() => handleDelete(item)}
@@ -279,7 +273,7 @@ export function ContentManager({ section, helpText }: ContentManagerProps) {
               );
             })}
           </ul>
-          <p className="text-xs text-stone-400">
+          <p className="text-xs text-muted-foreground">
             {withPhotos === 0
               ? "Add photos to your items and they appear in the carousel at the top of the page."
               : `${withPhotos} photo${withPhotos === 1 ? "" : "s"} showing in the page carousel. The order here is the order guests see.`}
@@ -430,11 +424,7 @@ function ContentFormDialog({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isSaving}
-              className="bg-teal-600 text-white hover:bg-teal-500"
-            >
+            <Button type="submit" disabled={isSaving}>
               {isSaving ? "Saving…" : item ? "Save changes" : `Add ${singular}`}
             </Button>
           </DialogFooter>

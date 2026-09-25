@@ -2,6 +2,7 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -111,12 +112,15 @@ export function ImageUploadField({
       />
 
       {value ? (
-        <div className="relative w-full overflow-hidden rounded-md border">
-          {/* eslint-disable-next-line @next/next/no-img-element -- remote Cloudinary URL */}
-          <img
+        <div
+          className={`relative ${heightClass} w-full overflow-hidden rounded-md border border-border`}
+        >
+          <Image
             src={value.url}
             alt={alt}
-            className={`${heightClass} w-full object-cover`}
+            fill
+            sizes="(min-width: 640px) 400px, 100vw"
+            className="object-cover"
           />
           {isUploading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white">
@@ -140,7 +144,7 @@ export function ImageUploadField({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className={`flex ${heightClass} w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed text-sm text-muted-foreground hover:bg-accent disabled:opacity-60`}
+          className={`flex ${heightClass} w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border text-sm text-muted-foreground hover:bg-muted/30 disabled:opacity-60`}
         >
           {isUploading ? (
             <>
@@ -161,7 +165,7 @@ export function ImageUploadField({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={disabled}
-          className="text-xs text-muted-foreground underline"
+          className="text-xs text-muted-foreground underline hover:text-foreground"
         >
           Replace photo
         </button>
