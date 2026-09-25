@@ -29,13 +29,13 @@ export default function AmenitiesPage() {
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center">
-        <span className="text-sm font-medium uppercase tracking-wider text-teal-600 dark:text-teal-400">
+        <span className="text-sm font-medium uppercase tracking-wider text-accent">
           What&apos;s included
         </span>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+        <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Amenities at {resortName}
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-stone-600 dark:text-stone-300">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
           Everything you need for a comfortable stay, right on the property.
         </p>
       </div>
@@ -49,18 +49,18 @@ export default function AmenitiesPage() {
       {/* Amenities grid */}
       <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {amenities === undefined ? (
-          <p className="col-span-full text-center text-sm text-stone-500">
+          <p className="col-span-full text-center text-sm text-muted-foreground">
             Loading…
           </p>
         ) : amenities.length === 0 ? (
-          <p className="col-span-full text-center text-sm text-stone-500">
+          <p className="col-span-full text-center text-sm text-muted-foreground">
             Amenities are being added — check back soon.
           </p>
         ) : (
           amenities.map((item) => (
             <div
               key={item._id}
-              className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-teal-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-700"
+              className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition hover:border-accent hover:shadow-md dark:bg-surface"
             >
               {item.imageUrl ? (
                 <div className="relative h-40 w-full">
@@ -73,16 +73,16 @@ export default function AmenitiesPage() {
                   />
                 </div>
               ) : (
-                <div className="flex h-40 w-full items-center justify-center bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
+                <div className="flex h-40 w-full items-center justify-center bg-muted/30 text-muted-foreground">
                   <ImageOff size={24} />
                 </div>
               )}
               <div className="p-6">
-                <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+                <h2 className="text-lg font-semibold text-foreground">
                   {item.title}
                 </h2>
                 {item.description && (
-                  <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {item.description}
                   </p>
                 )}
@@ -105,11 +105,7 @@ export default function AmenitiesPage() {
 
       {/* CTA */}
       <div className="mt-12 flex flex-wrap justify-center gap-4">
-        <Button
-          asChild
-          size="lg"
-          className="bg-teal-600 px-8 text-white hover:bg-teal-500"
-        >
+        <Button asChild size="lg" className="px-8">
           <Link href="/rooms">Book a stay</Link>
         </Button>
         <Button asChild size="lg" variant="outline">
