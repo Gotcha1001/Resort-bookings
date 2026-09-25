@@ -27,15 +27,14 @@ export default function ActivitiesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="text-center">
-        <span className="text-sm font-medium uppercase tracking-wider text-teal-600 dark:text-teal-400">
+        <span className="text-sm font-medium uppercase tracking-wider text-accent">
           Things to do
         </span>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-50 sm:text-5xl">
+        <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Activities at {resortName}
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-stone-600 dark:text-stone-300">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
           Whether you want to explore, unwind or a bit of both — here&apos;s how
           guests typically spend their time.
         </p>
@@ -47,21 +46,20 @@ export default function ActivitiesPage() {
         </div>
       )}
 
-      {/* Activity grid */}
       <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {activities === undefined ? (
-          <p className="col-span-full text-center text-sm text-stone-500">
+          <p className="col-span-full text-center text-sm text-muted-foreground">
             Loading…
           </p>
         ) : activities.length === 0 ? (
-          <p className="col-span-full text-center text-sm text-stone-500">
+          <p className="col-span-full text-center text-sm text-muted-foreground">
             Activities are being added — check back soon.
           </p>
         ) : (
           activities.map((item) => (
             <div
               key={item._id}
-              className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-teal-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-700"
+              className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition hover:border-accent hover:shadow-md dark:bg-[var(--surface)]"
             >
               {item.imageUrl ? (
                 <div className="relative h-40 w-full">
@@ -74,16 +72,16 @@ export default function ActivitiesPage() {
                   />
                 </div>
               ) : (
-                <div className="flex h-40 w-full items-center justify-center bg-stone-100 text-stone-300 dark:bg-stone-800 dark:text-stone-600">
+                <div className="flex h-40 w-full items-center justify-center bg-muted/30 text-muted-foreground">
                   <ImageOff size={24} />
                 </div>
               )}
               <div className="p-6">
-                <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+                <h2 className="text-lg font-semibold text-foreground">
                   {item.title}
                 </h2>
                 {item.description && (
-                  <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {item.description}
                   </p>
                 )}
@@ -93,7 +91,6 @@ export default function ActivitiesPage() {
         )}
       </div>
 
-      {/* Contact */}
       {settings && (
         <div className="mt-14">
           <ContactInfo
@@ -104,19 +101,13 @@ export default function ActivitiesPage() {
         </div>
       )}
 
-      {/* Note */}
-      <p className="mx-auto mt-10 max-w-2xl text-center text-sm text-stone-500 dark:text-stone-400">
+      <p className="mx-auto mt-10 max-w-2xl text-center text-sm text-muted-foreground">
         Activities and surroundings can change with the seasons. Ask us when you
         arrive for the latest tips and recommendations.
       </p>
 
-      {/* CTA */}
       <div className="mt-8 flex flex-wrap justify-center gap-4">
-        <Button
-          asChild
-          size="lg"
-          className="bg-teal-600 px-8 text-white hover:bg-teal-500"
-        >
+        <Button asChild size="lg" className="px-8">
           <Link href="/rooms">Book a stay</Link>
         </Button>
         <Button asChild size="lg" variant="outline">
