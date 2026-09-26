@@ -61,7 +61,7 @@ export default function ActivitiesPage() {
           activities.map((item) => (
             <div
               key={item._id}
-              className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:border-teal-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-teal-700"
+              className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition hover:border-accent hover:shadow-md dark:bg-[var(--surface)]"
             >
               {item.imageUrl ? (
                 <div className="relative h-40 w-full">
